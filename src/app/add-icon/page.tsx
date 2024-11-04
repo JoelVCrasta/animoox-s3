@@ -2,14 +2,14 @@
 
 import { useState } from "react"
 import IconUploadForm from "@/components/IconUploadForm"
-import { Upload } from "lucide-react"
+import HeadingInfo from "@/components/HeadingInfo"
 import type { IIconFormData } from "@/utils/types"
 import { fileUpload } from "@/lib/s3Upload"
 import toast, { Toaster } from "react-hot-toast"
-import z from "zod"
+import { addIconSchema } from "@/utils/zodSchema"
 import axios from "axios"
 
-const AddProduct = () => {
+const AddIcon = () => {
   const [files, setFiles] = useState<File[] | null>(null)
   const [iconFormData, setIconFormData] = useState<IIconFormData>({
     iconStyle: "",
@@ -19,17 +19,10 @@ const AddProduct = () => {
     file: [],
   })
 
-  const addProductSchema = z.object({
-    iconStyle: z.string().min(1),
-    license: z.string().min(1),
-    category: z.string().min(1),
-    tags: z.array(z.string()).min(1),
-    file: z.array(z.string()).min(1),
-  })
-
   const validateAddProduct = (data: IIconFormData) => {
     try {
-      addProductSchema.parse(data)
+      addIconSchema.parse(data)
+      return true
     } catch (err) {
       toast.error("Please fill all the fields.")
       return false
@@ -53,7 +46,7 @@ const AddProduct = () => {
   }
 
   const handlePublishProduct = async () => {
-    if (!files) {
+    if (!files || files.length === 0) {
       toast.error("Please upload the icon file")
       return
     }
@@ -94,7 +87,7 @@ const AddProduct = () => {
   }
 
   return (
-    <section className="flex ">
+    <section className="flex">
       <Toaster />
       <div className="w-80 bg-white">sidebar</div>
 
@@ -108,28 +101,11 @@ const AddProduct = () => {
           <div></div>
         </div>
 
-        <div className="flex flex-col gap-y-2 md:flex-row items-start md:items-center justify-between py-4">
-          <h2 className="font-semibold text-lg text-gray-700">
-            Add the icon information below
-          </h2>
-
-          <div className="w-full md:w-fit flex justify-between space-x-4">
-            <button
-              onClick={handleSaveAsDraft}
-              className="py-3 px-6 font-semibold text-gray-400 border-2 border-gray-400 rounded-full text-sm"
-            >
-              Save as draft
-            </button>
-
-            <button
-              onClick={handlePublishProduct}
-              className="py-3 px-6 text-sm font-semibold bg-blue-500 text-white rounded-full hover:bg-blue-600 transition duration-300 flex items-center"
-            >
-              <Upload size={20} className="mr-2" />
-              Publish product
-            </button>
-          </div>
-        </div>
+        <HeadingInfo
+          title="Add the icon information below"
+          handleSaveAsDraft={handleSaveAsDraft}
+          handlePublishProduct={handlePublishProduct}
+        />
 
         <IconUploadForm
           iconFormData={iconFormData}
@@ -142,4 +118,4 @@ const AddProduct = () => {
   )
 }
 
-export default AddProduct
+export default AddIcon
