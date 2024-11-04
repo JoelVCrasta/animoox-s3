@@ -4,9 +4,13 @@ import { useState } from "react"
 import IconUploadForm from "@/components/IconUploadForm"
 import { Upload } from "lucide-react"
 import type { IIconFormData } from "@/utils/types"
-// import z from "zod"
+import { fileUpload } from "@/lib/s3Upload"
+import toast, { Toaster } from "react-hot-toast"
+import z from "zod"
+import axios from "axios"
 
 const AddProduct = () => {
+  const [files, setFiles] = useState<File[] | null>(null)
   const [iconFormData, setIconFormData] = useState<IIconFormData>({
     iconStyle: "",
     license: "",
@@ -15,16 +19,85 @@ const AddProduct = () => {
     file: [],
   })
 
-  const handleSaveAsDraft = () => {
+  const addProductSchema = z.object({
+    iconStyle: z.string().min(1),
+    license: z.string().min(1),
+    category: z.string().min(1),
+    tags: z.array(z.string()).min(1),
+    file: z.array(z.string()).min(1),
+  })
+
+  const validateAddProduct = (data: IIconFormData) => {
+    try {
+      addProductSchema.parse(data)
+    } catch (err) {
+      toast.error("Please fill all the fields.")
+      return false
+    }
+  }
+
+  const clearForm = () => {
+    setIconFormData({
+      iconStyle: "",
+      license: "",
+      category: "",
+      tags: [],
+      file: [],
+    })
+
+    setFiles(null)
+  }
+
+  const handleSaveAsDraft = async () => {
     console.log("Save as draft")
   }
 
-  const handlePublishProduct = () => {
-    console.log(iconFormData)
+  const handlePublishProduct = async () => {
+    if (!files) {
+      toast.error("Please upload the icon file")
+      return
+    }
+
+    try {
+      const fileUrls = await fileUpload(files)
+      console.log(fileUrls)
+
+      if (fileUrls.s3Status === "error") {
+        toast.error("Error uploading the icon file")
+        return
+      }
+
+      const updatedFormData = {
+        ...iconFormData,
+        file: fileUrls.fileUrls || [],
+      }
+      setIconFormData(updatedFormData)
+      console.log(updatedFormData)
+
+      const validity = validateAddProduct(updatedFormData)
+      if (validity === false) return
+
+      const response = await axios.post("/api/add-product", iconFormData)
+
+      if (response.data.success) {
+        console.log(response.data)
+        toast.success("Icon uploaded successfully")
+      } else {
+        toast.error("Error uploading the icon")
+      }
+
+      clearForm()
+    } catch (err) {
+      console.error(err)
+      toast.error("Something went wrong")
+    }
   }
 
   return (
     <section className="flex ">
+      <Toaster />
+      <div className="w-80 bg-white">sidebar</div>
+
       <div className="w-full p-4 md:p-10">
         <div>
           <div className="space-y-2">
@@ -61,6 +134,8 @@ const AddProduct = () => {
         <IconUploadForm
           iconFormData={iconFormData}
           setIconFormData={setIconFormData}
+          files={files}
+          setFiles={setFiles}
         />
       </div>
     </section>
