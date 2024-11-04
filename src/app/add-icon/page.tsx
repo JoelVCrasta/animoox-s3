@@ -77,7 +77,7 @@ const AddProduct = () => {
       const validity = validateAddProduct(updatedFormData)
       if (validity === false) return
 
-      const response = await axios.post("/api/add-product", iconFormData)
+      const response = await axios.post("/api/add-icon", iconFormData)
 
       if (response.data.success) {
         console.log(response.data)
