@@ -8,14 +8,18 @@ import { IIconFormData } from "@/utils/types"
 interface IconUploadFormProps {
   iconFormData: IIconFormData
   setIconFormData: (value: IIconFormData) => void
+  files: File[] | null
+  setFiles: (files: File[] | null) => void
 }
 
 const IconUploadForm = ({
   iconFormData,
   setIconFormData,
+  files,
+  setFiles,
 }: IconUploadFormProps) => {
   return (
-    <div className="flex flex-col items-center min-h-screen">
+    <div className="flex flex-col items-center">
       <div className="w-full p-8 bg-white rounded-3xl">
         <div className="flex flex-wrap gap-4 mb-6">
           <Select
@@ -53,10 +57,8 @@ const IconUploadForm = ({
           <FileUpload
             label={"Main files (Icon)"}
             accept={"images/*"}
-            value={iconFormData.file}
-            onChange={(value) => {
-              setIconFormData({ ...iconFormData, file: value })
-            }}
+            files={files}
+            setFiles={setFiles}
           />
         </div>
 
@@ -64,18 +66,20 @@ const IconUploadForm = ({
           <label className="block text-gray-700 font-semibold mb-1">
             Tags <span className="text-red-500">*</span>
           </label>
-          <TagsInput
-            value={iconFormData.tags || []}
-            onChange={(value) => {
-              setIconFormData({ ...iconFormData, tags: value })
-            }}
-            separators={[" ", "Enter"]}
-            beforeAddValidate={(tag) => tag.length <= 20}
-            classNames={{
-              input: "p-2",
-              tag: "bg-background text-gray-600",
-            }}
-          />
+          <div className="border-[1px] border-gray-300 rounded-lg outline-none">
+            <TagsInput
+              value={iconFormData.tags || []}
+              onChange={(value) => {
+                setIconFormData({ ...iconFormData, tags: value })
+              }}
+              separators={[" ", "Enter"]}
+              beforeAddValidate={(tag) => tag.length <= 20}
+              classNames={{
+                input: "p-2 text-gray-400",
+                tag: "bg-background text-gray-600 text-lg",
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
