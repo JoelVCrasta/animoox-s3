@@ -19,6 +19,7 @@ export interface IPackFormData {
   featureImageUrl: string
   productViewImageUrl: string[]
   graphicFileIncluded: string
+  compatibility: string
   tags: string[]
   keyFeatures: string[]
 }
