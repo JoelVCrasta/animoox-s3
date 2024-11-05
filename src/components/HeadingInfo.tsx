@@ -1,15 +1,18 @@
 import { Upload } from "lucide-react"
+import { RotatingLines } from "react-loader-spinner"
 
 interface IHeadingInfo {
   title: string
   handleSaveAsDraft: () => void
   handlePublishProduct: () => void
+  loading?: boolean
 }
 
 const HeadingInfo = ({
   title,
   handleSaveAsDraft,
   handlePublishProduct,
+  loading,
 }: IHeadingInfo) => {
   return (
     <div className="flex flex-col gap-y-2 md:flex-row items-start md:items-center justify-between py-4">
@@ -25,10 +28,16 @@ const HeadingInfo = ({
 
         <button
           onClick={handlePublishProduct}
-          className="py-3 px-6 text-sm font-semibold bg-blue-500 text-white rounded-full hover:bg-blue-600 transition duration-300 flex items-center"
+          className="py-3 px-4 text-sm font-semibold bg-blue-500 text-white rounded-full hover:bg-blue-600 transition duration-300 flex items-center"
         >
-          <Upload size={20} className="mr-2" />
-          Publish product
+          {loading ? (
+            <RotatingLines width="20" strokeColor="white" />
+          ) : (
+            <>
+              <Upload size={20} className="mr-2" />
+              <p>Publish Product</p>
+            </>
+          )}
         </button>
       </div>
     </div>
