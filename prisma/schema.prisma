@@ -21,4 +21,25 @@ model Icon {
   @@map("icons")
 }
 
+model Pack {
+  id                   String    @id @default(auto()) @map("_id") @db.ObjectId
+  title                String
+  subtitle             String
+  category             String
+  description          String
+  packagePrice         Float
+  discount             Float
+  thumbnailUrl         String
+  illustrationUrl      String
+  animationUrl         String
+  featureImageUrl      String
+  productViewImageUrl  String[]
+  graphicFileIncluded  String
+  compatibility        String
+  tags                 String[]
+  keyFeatures          String[]
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
+  @@map("packs")
+}
