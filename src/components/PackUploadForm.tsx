@@ -132,6 +132,7 @@ const PackUploadForm = ({
             accept={"images/*"}
             files={files.featureImageFiles}
             setFiles={(file) => setFiles({ ...files, featureImageFiles: file })}
+            multiple={false}
           />
         </div>
 
@@ -177,7 +178,12 @@ const PackUploadForm = ({
                     Compatibilty <span className="text-red-500">*</span>
                   </label>
 
-                  <CompatibilityIcons />
+                  <CompatibilityIcons
+                    value={packFormData.compatibility}
+                    onChange={(value) =>
+                      setPackFormData({ ...packFormData, compatibility: value })
+                    }
+                  />
                 </div>
               </div>
 

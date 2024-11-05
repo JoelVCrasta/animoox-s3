@@ -51,7 +51,7 @@ const FileUpload = ({
 
       <div
         className={`
-          flex flex-col items-center justify-center border-2 border-dashed border-gray-300  rounded-lg bg-gray-100 text-gray-400 font-semibold
+          flex flex-col h-[376px] items-center justify-center border-2 border-dashed border-gray-300  rounded-lg bg-gray-100 text-gray-400 font-semibold
           ${height ? `h-${height}` : "p-16"}
           ${isDragging ? "border-blue-500" : ""}
         `}
