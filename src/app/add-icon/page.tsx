@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import IconUploadForm from "@/components/IconUploadForm"
 import HeadingInfo from "@/components/HeadingInfo"
 import type { IIconFormData } from "@/utils/types"
-import { fileUpload } from "@/lib/s3Upload"
+import { fileUpload } from "@/actions/s3Upload"
 import toast, { Toaster } from "react-hot-toast"
-import { addIconSchema } from "@/utils/zodSchema"
+import { validateIconForm } from "@/utils/validateForm"
 import axios from "axios"
 
 const AddIcon = () => {
@@ -18,16 +18,6 @@ const AddIcon = () => {
     tags: [],
     file: [],
   })
-
-  const validateAddProduct = (data: IIconFormData) => {
-    try {
-      addIconSchema.parse(data)
-      return true
-    } catch (err) {
-      toast.error("Please fill all the fields.")
-      return false
-    }
-  }
 
   const clearForm = () => {
     setIconFormData({
@@ -41,8 +31,18 @@ const AddIcon = () => {
     setFiles(null)
   }
 
+  useEffect(() => {
+    const iconFormDataDraft = localStorage.getItem("iconFormData")
+    if (iconFormDataDraft) {
+      setIconFormData(JSON.parse(iconFormDataDraft))
+    }
+
+    localStorage.removeItem("iconFormData")
+  }, [])
+
   const handleSaveAsDraft = async () => {
-    console.log("Save as draft")
+    localStorage.setItem("iconFormData", JSON.stringify(iconFormData))
+    toast.success("Saved as draft")
   }
 
   const handlePublishProduct = async () => {
@@ -52,7 +52,10 @@ const AddIcon = () => {
     }
 
     try {
-      const fileUrls = await fileUpload(files)
+      const preValidity = validateIconForm(iconFormData)
+      if (preValidity === false) return
+
+      const fileUrls = await fileUpload(files, "icons")
       console.log(fileUrls)
 
       if (fileUrls.s3Status === "error") {
@@ -64,13 +67,12 @@ const AddIcon = () => {
         ...iconFormData,
         file: fileUrls.fileUrls || [],
       }
-      setIconFormData(updatedFormData)
       console.log(updatedFormData)
 
-      const validity = validateAddProduct(updatedFormData)
+      const validity = validateIconForm(updatedFormData)
       if (validity === false) return
 
-      const response = await axios.post("/api/add-icon", iconFormData)
+      const response = await axios.post("/api/add-icon", updatedFormData)
 
       if (response.data.success) {
         console.log(response.data)
